@@ -9,4 +9,31 @@ describe Glo::Context do
       expect(context.name).to eq 'adam'
     end
   end
+
+  describe "setting and reading values via method setter" do
+    it "works" do
+      context = Glo::Context.new
+
+      context.name = "adam"
+
+      expect(context.name).to eq "adam"
+    end
+  end
+
+  it "is not success by default" do
+    context = Glo::Context.new
+
+    expect(context.success?).to be_falsey
+    expect(context.fail?).to be_truthy
+  end
+
+  describe "#success!" do
+    it "sets as success" do
+      context = Glo::Context.new
+
+      context.success!
+
+      expect(context.success?).to be_truthy
+    end
+  end
 end
