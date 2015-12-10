@@ -20,11 +20,11 @@ describe Glo::Context do
     end
   end
 
-  it "is not success by default" do
+  it "is success by default" do
     context = Glo::Context.new
 
-    expect(context.success?).to be_falsey
-    expect(context.fail?).to be_truthy
+    expect(context.success?).to be_truthy
+    expect(context.fail?).to be_falsey
   end
 
   describe "#success!" do

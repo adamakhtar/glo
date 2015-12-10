@@ -8,7 +8,7 @@ class Glo::Context
 
   attr_writer :success
   def success
-    @success ||= false
+    @success ||= true
   end
 
   def success?
