@@ -4,6 +4,10 @@ describe Glo::Op do
 
   class Dummy 
     include Glo::Op
+
+    def call
+      context.new_name = 'adam'
+    end
   end
 
   describe ".initialize" do
@@ -25,6 +29,20 @@ describe Glo::Op do
       op = Dummy.new(context)
 
       expect(op.context.name).to eq context.name
+    end
+  end
+
+  describe ".call" do
+    it "returns context" do
+      context = Dummy.call
+
+      expect(context).to be_a Glo::Context
+    end
+
+    it "runs the instance method #call" do
+        context = Dummy.call
+
+        expect(context.new_name).to eq 'adam'
     end
   end
 end

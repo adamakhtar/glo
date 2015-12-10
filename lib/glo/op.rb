@@ -4,6 +4,14 @@ module Glo
 
     attr_reader :context
 
+    module ClassMethods
+      def call(params={})
+        op = new(params)
+        op.call
+        op.context
+      end
+    end
+
     def initialize(params={})
       if params.is_a? Glo::Context
         @context = params
