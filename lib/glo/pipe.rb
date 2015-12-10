@@ -5,5 +5,11 @@ module Glo
     def initialize(operations)
       @operations = operations
     end
+
+    def call(context={})
+      operations.each do |operation|
+        context = operation.call(context)
+      end
+    end
   end
 end
