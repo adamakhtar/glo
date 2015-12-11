@@ -10,6 +10,7 @@ module Glo
       operations.each do |operation|
         context = operation.call(context)
       end
+      context
     end
   end
 end
