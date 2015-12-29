@@ -2,6 +2,8 @@
 
 **Note** This gem has not been fully battletested and is still v0.0.1 so by all means play around with it but YMMV.
 
+`gem 'glo', github: 'robodisco/glo'`
+
 Glo helps you organize your business logic in your application into once central place rather than scattered across several models or even worst in your controller actions.
 
 It has operations and pipelines (Ops and Pipes for short).
