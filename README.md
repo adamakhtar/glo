@@ -1,41 +1,132 @@
 # Glo
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/glo`. To experiment with that code, run `bin/console` for an interactive prompt.
+**Note** This gem has not been fully battletested and is still v0.0.1 so by all means play around with it but YMMV.
 
-TODO: Delete this and the text above, and describe your gem
+Glo helps you organize your business logic in your application into once central place rather than scattered across several models or even worst in your controller actions.
 
-## Installation
+It has operations and pipelines (Ops and Pipes for short).
 
-Add this line to your application's Gemfile:
+Let's use an operation to centralize all the logic pertaining to keeping an Order model and it's totals in your ecommerce app up to date every time it is updated.
+
+In the update action in your controller 
 
 ```ruby
-gem 'glo'
+def update
+    op = UpdateOrder.new(order_params)
+    result = op.call
+
+    if result.success?
+        ...
+    else
+        ...
+    end
+end
 ```
 
-And then execute:
+Then create an operations directory in your project and create an operation class called UpdateOrder. You only need to define a call method and include `Glo::Op`
 
-    $ bundle
+```ruby
+# your_rails_app/app/operations/update_order.rb
 
-Or install it yourself as:
+class UpdateOrder
+    include Glo::Op
 
-    $ gem install glo
+    def call
+        find_order
+        calculate_line_items
+        calculate_tax
+        calculate_promotion_adjustments
+        calculate_shipping
+        update_order
+    end
 
-## Usage
+    private
 
-TODO: Write usage instructions here
+    def find_order
+      @order = Order.find(...)
+    end
 
-## Development
+    def calculate_line_items
+        total = 0
+        @order.line_items.each do |i|
+            total += i.amount
+        end
+        @order.line_item_total = total
+    end
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+    def update_order
+        unless @order.save!
+            context.fail!
+        end
+        context.order = @order
+    end
+    
+    ...
+end
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+**That's it!**
 
-## Contributing
+## Context
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/glo. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+In your operation class you have access to a context object which has all the params you passed during initialization. You can add more data to the context like so
+
+context.message = "Hey!"
+
+You can mark the operation as failed or success:
+
+context.fail! 
+context.fail? # true
+
+context.success!
+context.success? # true
+
+## Creating a chain of operation with pipelines
+
+You can also create a chain of operations via the Glo::Pipe 
+
+Let's assume the updating of an order is a lot more complex and you want to split the various steps into their own operations.
+
+Simply create operations for each step
+
+```ruby
+class CalculateLineItems
+    include Glo::Op
+
+    def call
+        # logic goes here
+    end
+end
+
+class CalculateTax
+    include Glo::Op
+    ...
+end
+
+class CalculateShipping
+    ...
+end
+```
+
+Then create and use a pipeline like so
+
+```ruby
+CreateOrder = Glo::Pipe.new([
+    CalculateLineItems,
+    CalculateTax,
+    CalculateShipping
+])
+
+result = CreateOrder.call(params)
+```
+
+On #call each operation will be called and will be passed the same context on which they can add subsequent data. If at any time an operation fails the pipeline will stop and no further operations will be called.
 
 
-## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+
+
+
+
+
 
