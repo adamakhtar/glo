@@ -65,6 +65,7 @@ class UpdateOrder
     
     ...
 end
+```
 
 **That's it!**
 
@@ -72,15 +73,18 @@ end
 
 In your operation class you have access to a context object which has all the params you passed during initialization. You can add more data to the context like so
 
-context.message = "Hey!"
+
+`context.message = "Hey!"``
 
 You can mark the operation as failed or success:
 
+```ruby
 context.fail! 
 context.fail? # true
 
 context.success!
 context.success? # true
+```
 
 ## Creating a chain of operation with pipelines
 
