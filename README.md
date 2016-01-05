@@ -86,9 +86,53 @@ context.success!
 context.success? # true
 ```
 
-## Creating a chain of operation with pipelines
+## Running multiple operations
 
-You can also create a chain of operations via the Glo::Pipe 
+Sometimes you might need to break an operation down into multiple steps and ensure that if one of the steps failed the subsequent steps are not. You could do this with the above Op 
+
+```ruby
+class UpdateOrder
+    include Glo::Op
+
+    def call
+        find_order
+        calculate_line_items unless context.fail?
+        calculate_tax unless context.fail?
+        calculate_promotion_adjustments unless context.fail?
+        calculate_shipping unless context.fail?
+        update_order unless context.fail?
+    end
+end
+```
+
+which is a bit verbose or you could use a Glo::Chain instead
+
+```ruby
+class UpdateOrder
+    include Glo::Chain
+
+    OPERATIONS = [
+        :find_order
+        :calculate_line_items
+        :calculate_tax
+        :calculate_promotion_adjustments
+        :calculate_shipping
+        :update_order
+    ]
+
+    private
+
+    def find_order
+      ...
+    end
+end
+```
+
+This ensures the context.succcess? is true before running each method.
+
+## Creating a chain for bigger operations
+
+The above chain works well for small methods. Sometimes however your methods start to grow in complexity and deserve their own classes. In this case you can create a chain of operations via the Glo::Pipe 
 
 Let's assume the updating of an order is a lot more complex and you want to split the various steps into their own operations.
 
