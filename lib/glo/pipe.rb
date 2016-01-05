@@ -9,6 +9,7 @@ module Glo
     def call(context={})
       operations.each do |operation|
         context = operation.call(context)
+        break if context.fail?
       end
       context
     end

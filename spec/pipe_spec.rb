@@ -18,6 +18,14 @@ describe Glo::Pipe do
     end
   end
 
+  op_fail = Class.new do
+    include Glo::Op
+
+    def call
+      context.fail!
+    end
+  end
+
   describe ".initialize" do
     it "accepts an array of ops" do
       pipeline = Glo::Pipe.new([op_a, op_b])
@@ -29,12 +37,10 @@ describe Glo::Pipe do
   describe ".call" do
     it "runs each operation" do
       context = {}
-    
       pipeline = Glo::Pipe.new([op_a, op_b])
 
-      expect(op_a).to receive(:call)
-      expect(op_b).to receive(:call)
-      pipeline.call(context)  
+      result = pipeline.call(context)
+      expect(result.name).to eq 'peter'
     end
 
     it "returns the context" do
@@ -53,6 +59,16 @@ describe Glo::Pipe do
       result = pipeline.call(context)  
 
       expect(result.name).to eq 'peter'
+    end
+
+    it "halts the pipeline if an operation fails" do
+      pipeline = Glo::Pipe.new([op_a, op_fail, op_b])
+
+      result = pipeline.call
+
+      expect(result).to be_fail
+      expect(result.name).to eq 'barry'
+
     end
   end
 end
