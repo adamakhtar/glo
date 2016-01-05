@@ -4,11 +4,12 @@ class Glo::Context
 
   def initialize(params={})
     @values = params_as_strings(params)
+    @success = true
   end
 
   attr_writer :success
   def success
-    @success ||= true
+    @success
   end
 
   def success?
