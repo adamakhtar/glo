@@ -7,6 +7,16 @@ class Glo::Context
     @success = true
   end
 
+  def self.build(params={})
+    if params.is_a? Glo::Context
+      params
+    elsif params.is_a? Hash
+      new(params)
+    else
+      raise ArgumentError, "Glo::Op must be initialized with an instance of either Hash or Glo::Context and not #{params.class.to_s}."
+    end
+  end
+
   attr_writer :success
   def success
     @success
