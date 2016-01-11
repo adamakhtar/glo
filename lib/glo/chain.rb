@@ -25,7 +25,7 @@ module Glo
     end
 
     def operations
-      OPERATIONS
+      self.class::OPERATIONS
     end
   end
 end
